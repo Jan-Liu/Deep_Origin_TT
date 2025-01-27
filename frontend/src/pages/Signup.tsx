@@ -1,20 +1,69 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import api from "../services/api.ts";
+import React, { useState, FC } from 'react';
+import { useNavigate } from 'react-router-dom';
+import api from '../services/api.ts';
 
-const Signup = () => {
-  const [formData, setFormData] = useState({ username: "", password: "" });
-  const [error, setError] = useState("");
+// Interface for the form data structure
+interface FormData {
+  username: string;
+  password: string;
+}
+
+// Interface for Axios error response structure (adjust according to your API's error format)
+interface ErrorResponse {
+  response: {
+    data: {
+      error: string;
+    };
+  };
+}
+
+const Signup: FC = () => {
+  const [formData, setFormData] = useState<FormData>({
+    username: '',
+    password: '',
+  });
+  const [error, setError] = useState<string>('');
   const navigate = useNavigate();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  /**
+   * Handles form submission for user registration
+   * @param e - React form event
+   * @returns Promise<void>
+   */
+  const handleSubmit = async (e: React.FormEvent): Promise<void> => {
     e.preventDefault();
     try {
-      await api.post("/auth/signup", formData);
-      navigate("/login"); // Navigate to login after successful signup
+      await api.post('/auth/signup', formData);
+      navigate('/login');
     } catch (err) {
-      setError("Failed to register");
+      // Type guard to check if error matches expected structure
+      if (isErrorResponse(err)) {
+        setError(err.response.data.error);
+      } else {
+        setError('An unexpected error occurred');
+      }
     }
+  };
+
+  /**
+   * Type guard for custom error response
+   * @param error - The caught error
+   * @returns boolean indicating if it's an ErrorResponse
+   */
+  const isErrorResponse = (error: unknown): error is ErrorResponse => {
+    return (error as ErrorResponse).response?.data?.error !== undefined;
+  };
+
+  /**
+   * Handles input changes and updates form state
+   * @param e - React change event from input element
+   */
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   return (
@@ -25,16 +74,18 @@ const Signup = () => {
         <form onSubmit={handleSubmit}>
           <input
             type="text"
+            name="username"
             placeholder="Username"
             value={formData.username}
-            onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+            onChange={handleInputChange}
             className="w-full p-2 mb-4 border rounded focus:outline-none focus:ring focus:border-blue-300"
           />
           <input
             type="password"
+            name="password"
             placeholder="Password"
             value={formData.password}
-            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+            onChange={handleInputChange}
             className="w-full p-2 mb-4 border rounded focus:outline-none focus:ring focus:border-blue-300"
           />
           <button
@@ -46,7 +97,7 @@ const Signup = () => {
         </form>
         <button
           type="button"
-          onClick={() => navigate("/login")} // Navigate to login page
+          onClick={() => navigate('/login')}
           className="w-full mt-4 py-2 bg-gray-300 text-black rounded hover:bg-gray-400"
         >
           Go to Login

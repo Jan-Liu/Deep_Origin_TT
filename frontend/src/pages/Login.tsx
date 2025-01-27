@@ -1,22 +1,29 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext.tsx";
-import api from "../services/api.ts";
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext.tsx';
+import api from '../services/api.ts';
 
 const Login = () => {
-  const [formData, setFormData] = useState({ username: "", password: "" });
-  const [error, setError] = useState("");
+  const [formData, setFormData] = useState({ username: '', password: '' });
+  const [error, setError] = useState('');
   const { login } = useAuth();
   const navigate = useNavigate();
 
+  /**
+   * Handles the form submission for login.
+   * Sends the login request to the API, manages the authentication token,
+   * and redirects the user to the dashboard upon successful login.
+   *
+   * @param e - The form submission event.
+   */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await api.post("/auth/login", formData);
+      const response = await api.post('/auth/login', formData);
       login(response.data.token);
-      navigate("/dashboard");
+      navigate('/dashboard');
     } catch (err) {
-      setError("Invalid username or password");
+      setError('Invalid username or password');
     }
   };
 
@@ -30,14 +37,18 @@ const Login = () => {
             type="text"
             placeholder="Username"
             value={formData.username}
-            onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, username: e.target.value })
+            }
             className="w-full p-2 mb-4 border rounded focus:outline-none focus:ring focus:border-blue-300"
           />
           <input
             type="password"
             placeholder="Password"
             value={formData.password}
-            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, password: e.target.value })
+            }
             className="w-full p-2 mb-4 border rounded focus:outline-none focus:ring focus:border-blue-300"
           />
           <button
@@ -49,7 +60,7 @@ const Login = () => {
         </form>
         <button
           type="button"
-          onClick={() => navigate("/signup")}
+          onClick={() => navigate('/signup')}
           className="w-full mt-4 py-2 bg-gray-300 text-black rounded hover:bg-gray-400"
         >
           Go to Signup

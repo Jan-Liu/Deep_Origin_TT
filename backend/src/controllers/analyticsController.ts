@@ -1,19 +1,20 @@
 import { Request, Response } from "express";
 import { Url } from "../models/Url";
 
+/**
+ * Fetch analytics data for a specific short URL.
+ * @param req - Express request object, expecting `slug` as a route parameter.
+ * @param res - Express response object.
+ */
 export const getAnalytics = async (req: Request, res: Response): Promise<void> => {
     const { slug } = req.params;
 
     try {
-        // Find the URL by slug
         const url = await Url.findOne({ slug });
-
         if (!url) {
             res.status(404).json({ error: "URL not found" });
             return;
         }
-
-        // Return analytics data
         res.json({
             originalUrl: url.originalUrl,
             shortUrl: url.shortUrl,
