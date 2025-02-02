@@ -1,16 +1,16 @@
 # Use an official Node.js image
 FROM node:18
 
-# Set working directory inside the container
+# Set the working directory inside the container
 WORKDIR /app
 
-# Copy package.json and package-lock.json
+# Copy package.json and package-lock.json before installing dependencies
 COPY package.json package-lock.json ./
 
-# Install dependencies
-RUN npm install --production
+# Install dependencies (including devDependencies for TypeScript)
+RUN npm install --legacy-peer-deps
 
-# Copy the rest of the application
+# Copy all project files
 COPY . .
 
 # Build TypeScript files
